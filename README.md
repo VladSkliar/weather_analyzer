@@ -88,3 +88,9 @@ Api have filters.
 /api/weather/?to_date=2016-02-11 # Get you weather that have date less or equal to_date
 /api/weather/?from_date=2016-02-11 # Get you weather that have date higher or equal from_date
 ```
+You can use all filter together
+```
+#!bash
+
+/api/weather/?city__title={City name}&to_date=2016-02-11&from_date=2016-02-07
+```
