@@ -78,3 +78,13 @@ celery -A wether_analyzer worker -l info
 
 ./manage.py runserver
 ```
+
+You can use dump.sql for example.
+Api have filters.
+```
+#!bash
+
+/api/weather/?city__title={City name}
+/api/weather/?to_date=2016-02-11 # Get you weather that have date less or equal to_date
+/api/weather/?from_date=2016-02-11 # Get you weather that have date higher or equal from_date
+```
