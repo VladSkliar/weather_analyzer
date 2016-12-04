@@ -1,0 +1,4 @@
+/venv
+migrations/
+*.pyc
+*.py[cod]
