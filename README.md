@@ -80,7 +80,7 @@ celery -A wether_analyzer worker -l info
 ```
 
 You can use dump.sql for example.
-Api have filters.
+API have filters.
 ```
 #!bash
 
