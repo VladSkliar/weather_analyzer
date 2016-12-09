@@ -9,7 +9,7 @@ class WeatherAdmin(admin.ModelAdmin):
 
 
 class CurrentWeatherAdmin(admin.ModelAdmin):
-    readonly_fields = ('created', 'delta')
+    readonly_fields = ('created',)
 
 
 admin.site.register(WeatherForecast, WeatherAdmin)

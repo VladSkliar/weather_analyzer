@@ -12,7 +12,7 @@ class CityModel(TestCase):
     def test_create(self):
         test_city = City.objects.last()
         self.assertEqual(self.city, test_city)
-        self.assertEqual(self.city.city_true, True)
+        self.assertEqual(self.city.avalible, True)
         self.assertEqual(self.city.title, self.title)
 
 
@@ -42,11 +42,11 @@ class CurrentWeatherModel(TestCase):
         self.title = 'Test'
         self.city = City.objects.create(title=self.title)
         self.date = datetime.datetime.now()
-        self.temperature = 5
+        self.temperature = 130
         self.weather = WeatherForecast.objects.create(city=self.city,
                                                       date=self.date,
                                                       temperature=self.temperature)
-        self.current_temperature = 3
+        self.current_temperature = 100
         self.current_weather = CurrentWeather.objects.create(city=self.city,
                                                      date=self.date,
                                                      temperature=self.current_temperature)
@@ -57,12 +57,7 @@ class CurrentWeatherModel(TestCase):
         self.assertEqual(test_wether.city, self.city)
         self.assertEqual(test_wether.date, self.date.date())
         self.assertEqual(test_wether.temperature, self.current_temperature)
-        self.assertEqual(test_wether.delta, '')
-
-    def test_delta_creation(self):
-        self.current_weather.check_delta_and_save()
-        test_wether = CurrentWeather.objects.last()
-        self.assertEqual(test_wether.delta, str(float(self.temperature-self.current_temperature)))
+        self.assertEqual(test_wether.forecasts_mistake[0]['mistake_percent'], '30.0%')
 
     def test_get_request(self):
         response = self.client.get('/api/weather/')

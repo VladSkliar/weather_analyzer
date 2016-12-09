@@ -6,7 +6,7 @@ from django.db import models
 
 class City(models.Model):
     title = models.CharField(max_length=100, verbose_name='City', unique=True)
-    city_true = models.BooleanField(default=True)
+    avalible = models.BooleanField(default=True)
 
     def __unicode__(self):
         return self.title
@@ -15,40 +15,21 @@ class City(models.Model):
 class WeatherForecast(models.Model):
     city = models.ForeignKey('City', related_name='wether_forecasts')
     date = models.DateField()
-    created = models.DateTimeField(auto_now_add=True)
+    created = models.DateField(auto_now_add=True)
     temperature = models.SmallIntegerField(null=True)  # Temrerature in metric units
 
     def __unicode__(self):
         return '%s %s' % (self.city.title, self.date)
 
     class Meta:
-        unique_together = (("city", "date"),)
+        unique_together = (("city", "date", 'created'),)
 
 
 class CurrentWeather(models.Model):
-    delta = models.CharField(max_length=20)
     city = models.ForeignKey('City', related_name='current_weather')
     date = models.DateField()
-    created = models.DateTimeField(auto_now_add=True)
+    created = models.DateField(auto_now_add=True)
     temperature = models.SmallIntegerField(null=True)
-
-    def check_delta_and_save(self):
-        city, date = self.city, self.date
-        forecast = WeatherForecast.objects.filter(city=city, date=date).first()
-
-        if forecast:
-            print forecast.temperature, self.temperature
-            delta = float(forecast.temperature)-float(self.temperature)
-            self.delta = delta
-            '''
-            Не знаю как правильно считать процент ошибки прогноза погоды
-            нужен точный алгоритм который я могу использовать
-            Но зная разнизу между реальной температурой и прогнозируемой могу
-            использовать любой алгоритм
-            '''
-            # import math
-            # self.delta = math.ceil((delta/float(self.temperature))*100)
-            self.save()
 
     def __unicode__(self):
         return '%s %s' % (self.city.title, self.date)
@@ -57,10 +38,29 @@ class CurrentWeather(models.Model):
         unique_together = (("city", "date"),)
 
     @property
-    def wrong_percent(self):
-        if self.delta:
-            return '{0}°C'.format(str(self.delta))
-        return None
+    def forecasts_mistake(self):
+        import math
+        """
+        Выбираю все прогнозы для города и даты этого обьекта
+        """
+        forecasts = WeatherForecast.objects.filter(city=self.city,
+                                                   date=self.date)
+        if forecasts:
+            '''
+            Если существует хоть один прогноз,
+            рассчитываем его ошибку и добавляем в список прогнозов
+            Таким образом если будет до 3 прогнозов и их ошибок.
+            
+            Если прогнозов нет, выдаем сообщение про их отсутствие
+            '''
+            forecasts_list = []
+            for forecast in forecasts:
+                mistake = float(forecast.temperature - self.temperature)
+                mistake_percent = math.ceil(100*(mistake/float(self.temperature)))
+                forecasts_list.append({"forecast_date": forecast.created,
+                                       "mistake_percent": '{0}%'.format(mistake_percent)})
+            return forecasts_list
+        return {'message': 'No find forecasts for that date(s)'}
 
     @property
     def city_info(self):

@@ -5,4 +5,4 @@ from models import CurrentWeather
 class CurrentWeatherSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = CurrentWeather
-        fields = ('city_info', 'date', 'wrong_percent')
+        fields = ('city_info', 'date', 'forecasts_mistake')
